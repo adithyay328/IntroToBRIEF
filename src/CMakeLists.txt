@@ -1,0 +1,1 @@
+add_executable(app Main.cpp FAST.cpp)
