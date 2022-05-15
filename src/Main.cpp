@@ -3,6 +3,7 @@
 #include "BRIEF.hpp"
 #include <list>
 #include <array>
+#include <vector>
 #include <stdlib.h>
 
 // In this program, we're going to load both images, then
@@ -37,7 +38,8 @@ int main(int argc, char** argv ) {
 
     // Creating clone to draw on
     cv::Mat fastDrawingClone = firstImage.clone();
-
+    
+    // Displaying the first image with all FAST points drawn on
     for(auto it = FASTFirstImage -> begin(); it != FASTFirstImage -> end(); it++) {
         cv::circle(fastDrawingClone, *it, 3, cv::Scalar(0, 255, 0));
     }
@@ -45,12 +47,13 @@ int main(int argc, char** argv ) {
     cv::imshow("Points", fastDrawingClone);
     cv::waitKey(0);
 
+    // Printing the number of FAST points we've found
     std::cout << FASTFirstImage -> size() << std::endl;
 
     // Getting BRIEF descriptors for both images
     std::list<std::bitset<DESC_LEN>>* firstImageBRIEF = briefDescriptor(firstImage, FASTFirstImage);
     std::list<std::bitset<DESC_LEN>>* secondImageBRIEF = briefDescriptor(secondImage, FASTSecondImage);
-
+    
     for(int i = 0; i < FASTFirstImage -> size(); i++) {
         // Advancing FAST and BRIEF iterators to current index
         auto firstFastIt = FASTFirstImage -> begin();
