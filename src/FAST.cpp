@@ -1,9 +1,10 @@
+#include <opencv2/opencv.hpp>
 #include "FAST.hpp"
 
 using namespace cv;
 
 // Returns the pixel intensity of a black and white image at a given (col, row)
-int getIntensity(Mat img, int col, int row) {
+int fast_getIntensity(Mat img, int col, int row) {
   // Access needs to be in (row, col) order since that's
   // how openCV allows their access. An annoying quirk
   return (int)img.at<uchar>(row, col);
@@ -11,7 +12,7 @@ int getIntensity(Mat img, int col, int row) {
 
 // Given a BGR image, extracts FAST edges and draws a circle on
 // each one of those points
-std::list<std::array<int, 2>*> getEdgePoints(Mat image) {
+std::list<cv::Point>* FASTDetector(Mat image) {
   // Converting to gray scale
   Mat img_gray;
   cvtColor(image, img_gray, COLOR_BGR2GRAY, 1);
@@ -20,8 +21,9 @@ std::list<std::array<int, 2>*> getEdgePoints(Mat image) {
   Mat img_blur;
   GaussianBlur(img_gray, img_blur, Size(3, 3), 0);
 
-  // This list stores all corner cooridnates we've found
-  std::list<std::array<int, 2>*> corners = std::list<std::array<int, 2>*>();
+  // This list stores all corner cooridnates we've found, will
+  // return as result
+  std::list<cv::Point>* corners = new std::list<cv::Point>();
   
   // Iterating column first:
   for(int c = BRESRADIUS; c < img_blur.cols - BRESRADIUS; c++) {
@@ -32,25 +34,25 @@ std::list<std::array<int, 2>*> getEdgePoints(Mat image) {
         std::array<int, 16> intensities = std::array<int, 16>();
 
         // Getting all the intensities into an array by hardcoding
-        intensities[0] = getIntensity(img_blur, c, r - 3);
-        intensities[1] = getIntensity(img_blur, c + 1, r - 3);
-        intensities[2] = getIntensity(img_blur, c + 2, r - 2);
-        intensities[3] = getIntensity(img_blur, c + 3, r - 1);
-        intensities[4] = getIntensity(img_blur, c + 3, r);
-        intensities[5] = getIntensity(img_blur, c + 3, r + 1);
-        intensities[6] = getIntensity(img_blur, c + 2, r + 2);
-        intensities[7] = getIntensity(img_blur, c + 1, r + 3);
-        intensities[8] = getIntensity(img_blur, c, r + 3);
-        intensities[9] = getIntensity(img_blur, c - 1, r + 3);
-        intensities[10] = getIntensity(img_blur, c - 2, r + 2);
-        intensities[11] = getIntensity(img_blur, c - 3, r + 1);
-        intensities[12] = getIntensity(img_blur, c - 3, r);
-        intensities[13] = getIntensity(img_blur, c - 3, r - 1);
-        intensities[14] = getIntensity(img_blur, c - 2, r - 2);
-        intensities[15] = getIntensity(img_blur, c - 1, r - 3);
+        intensities[0] = fast_getIntensity(img_blur, c, r - 3);
+        intensities[1] = fast_getIntensity(img_blur, c + 1, r - 3);
+        intensities[2] = fast_getIntensity(img_blur, c + 2, r - 2);
+        intensities[3] = fast_getIntensity(img_blur, c + 3, r - 1);
+        intensities[4] = fast_getIntensity(img_blur, c + 3, r);
+        intensities[5] = fast_getIntensity(img_blur, c + 3, r + 1);
+        intensities[6] = fast_getIntensity(img_blur, c + 2, r + 2);
+        intensities[7] = fast_getIntensity(img_blur, c + 1, r + 3);
+        intensities[8] = fast_getIntensity(img_blur, c, r + 3);
+        intensities[9] = fast_getIntensity(img_blur, c - 1, r + 3);
+        intensities[10] = fast_getIntensity(img_blur, c - 2, r + 2);
+        intensities[11] = fast_getIntensity(img_blur, c - 3, r + 1);
+        intensities[12] = fast_getIntensity(img_blur, c - 3, r);
+        intensities[13] = fast_getIntensity(img_blur, c - 3, r - 1);
+        intensities[14] = fast_getIntensity(img_blur, c - 2, r - 2);
+        intensities[15] = fast_getIntensity(img_blur, c - 1, r - 3);
 
         // Now that we have all intensities, calculate how many are greater or lower than the center point
-        int cIntensity = getIntensity(img_blur, c, r);
+        int cIntensity = fast_getIntensity(img_blur, c, r);
 
         // These counts count up how many contiguous intensity values
         // were higher or lower than the threshold.
@@ -74,10 +76,12 @@ std::list<std::array<int, 2>*> getEdgePoints(Mat image) {
 
           // Now that updates are done, if this satisfies a corner's requirements, add to corner list
           if(lowCount >= NUMBEROFINTENSITIES || highCount >= NUMBEROFINTENSITIES) {
-            std::array<int, 2>* coords = new std::array<int, 2>{ c , r };
+            cv::Point newPoint;
+            newPoint.x = c;
+            newPoint.y = r;
 
             // Pushing to corners list
-            corners.push_back(coords);
+            corners->push_back(newPoint);
 
             // Exiting out of the loop for this pixel
             break;

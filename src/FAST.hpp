@@ -17,11 +17,11 @@ const int BRESRADIUS = 3;
 
 // The number of points that need to be greater or lower.
 // This is arbitrary, we can learn it later
-const int NUMBEROFINTENSITIES = 12;
+const int NUMBEROFINTENSITIES = 11;
 
 // This is the threshold value. Arbitrarily selected
-const int THRESH = 40;
+const int THRESH = 50;
 
 // This function takes in a raw, BGR image, and returns a list
 // of [col, row] pairs that correspond to all the features it found
-std::list<std::array<int, 2>*> getEdgePoints(cv::Mat image);
+std::list<cv::Point>* FASTDetector(cv::Mat image);

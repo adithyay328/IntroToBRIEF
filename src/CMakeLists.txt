@@ -1,1 +1,1 @@
-add_executable(app Main.cpp FAST.cpp)
+add_executable(app Main.cpp FAST.cpp BRIEF.cpp)
